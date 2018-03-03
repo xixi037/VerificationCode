@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>验证码核查</title>
+    <link rel="stylesheet" href="/static/Bootstrap/css/bootstrap.css">
+    <script type="text/javascript" src="/static/js/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+{% load static %}
+<div class="container">
+    <div style="text-align: center">
+        <input type="text" id="operator1" placeholder="姓名" value={{ operator }}>
+        <button class="btn btn-primary btn-lg" onclick="javascript:count()">查询</button>
+        <p id="count"> </p>
+    </div>
+    <div id="result">
+        <form id="form1">
+            {% csrf_token %}
+            <input hidden name="operator" id="operator" value=" ">
+            <table class="table table-sm">
+                {% for img in imglist %}
+                    {% if forloop.counter|divisibleby:'4' %}
+                        <td>
+                            <img src="{% static img %}"><br>
+                            <input type="text" name={{ img.path }}><br>
+                            <strong style="color:red"></strong>
+                        </td></tr>
+                    {% elif forloop.counter|add:"1"|divisibleby:'4' %}
+                        <td>
+                            <img src="{% static img %}"><br>
+                            <input type="text" value="{{ img.operator }}" name="{{ img.path }}"><br><strong style="color:red"></strong>
+                        </td>
+                    {% elif forloop.counter|add:"2"|divisibleby:'4' %}
+                        <td>
+                            <img src="{% static img %}"><br>
+                            <input type="text" name={{ img.path }}><br><strong style="color:red"></strong>
+                        </td>
+                    {% else %}
+                        <tr>
+                        <td>
+                            <img src="{% static img %}"><br>
+                            <input type="text" name={{ img.path }}><br><strong style="color:red"></strong>
+                        </td>
+                    {% endif %}
+                {% endfor %}
+                {% if not forloop.counter|divisibleby:'4' %}
+                    </tr>
+                {% endif %}
+            </table>
+
+        </form>
+        <div style="text-align: center">
+            <button class="btn btn-primary btn-lg" onclick="javascript:check()">提交</button>
+        </div>
+    </div>
+</div>
+
+</body>
+<script>
+    var check = function () {
+        var len = $("input").length;
+        var operator = $('#operator1').val();
+        var flag = 1;
+        var value = new Array();
+        {#        console.log(operator);#}
+        if (operator != "") {
+            $('#operator').val(operator);
+        }
+        var j = 0;
+        for (var i = 2; i < len; i++) {
+            $("strong").eq(i - 2).text("");
+            if ($("input")[i].value == "") {
+                alert("需要全部填写！");
+                flag = 0;
+                return false;
+            }
+            value[i - 2] = $("input")[i].value;
+        }
+        console.log(value);
+        console.log(value.length);
+        len = value.length;
+        for (i = 1; i < len; i++) {
+            if (!value[i].match(/^[0-9a-zA-Z]{4}$/)) {
+                alert("格式错误，需重新填写！");
+                j = i - 1;
+                $("strong").eq(j).text("格式有误！");
+                flag = 0;
+                return false;
+            }
+        }
+        if (flag == 1) {
+            $.ajax({
+                url: '{% url 'home' %}',
+                data: $('#form1').serializeArray(),
+                type: 'POST',
+                success: function (data) {
+                    $('#result').html(data);
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+    };
+    var count = function () {
+        var operator = $('#operator1').val();
+        $.ajax({
+            url: '{% url 'get_count' %}',
+            data: {
+                'operator': operator,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            type: 'POST',
+            success: function (data) {
+                $('#count').html(data);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        })
+    }
+</script>
+</html>

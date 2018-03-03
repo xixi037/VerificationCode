@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <form action="." method="POST" id="form1">
+        {% csrf_token %}
+        <input hidden name="operator" id="operator" value=" ">
+        <table class="table table-sm">
+            {% for img in imglist %}
+                {% if forloop.counter|divisibleby:'4' %}
+                    <td>
+                        <img src="{% static img %}"><br>
+                        <input type="text" name={{ img }}><strong style="color:red"></strong>
+                    </td></tr>
+                {% elif forloop.counter|add:"1"|divisibleby:'4' %}
+                    <td>
+                        <img src="{% static img %}"><br>
+                        <input type="text" name={{ img }}><strong style="color:red"></strong>
+                    </td>
+                {% elif forloop.counter|add:"2"|divisibleby:'4' %}
+                    <td>
+                        <img src="{% static img %}"><br>
+                        <input type="text" name={{ img }}><strong style="color:red"></strong>
+                    </td>
+                {% else %}
+                    <tr>
+                    <td>
+                        <img src="{% static img %}"><br>
+                        <input type="text" name={{ img }}><strong style="color:red"></strong>
+                    </td>
+                {% endif %}
+            {% endfor %}
+            {% if not forloop.counter|divisibleby:'4' %}
+                </tr>
+            {% endif %}
+        </table>
+        <div style="text-align: center">
+            <input type="submit" class="btn btn-primary btn-lg" value="提交" onclick="return check()">
+        </div>
+    </form>
+
+{% endblock %}
+{% block script %}
+    <script>
+        var check = function () {
+            var len = $("input").length;
+            console.log(len);
+            for (var i = 2; i < len; i++) {
+                if ($("input")[i].value == "") {
+                    alert("需要全部填写！");
+                    return false;
+                }
+                {#                if($("input")[i].value.length != 4 || !$("input")[i].val().match(/^([a-zA-Z0-9_-])/))#}
+                {#                {#}
+                {#                    alert("格式错误，需重新填写！");#}
+                {#                    $("strong")[i-2].text("格式有误！");#}
+                {#                    return false;#}
+                {#                }#}
+            }
+            var operator = $('#operator1').val();
+            console.log(operator);
+            if (operator != "") {
+                $('#operator').val(operator);
+            }
+        };
+    </script>
+{% endblock %}

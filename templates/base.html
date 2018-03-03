@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>验证码</title>
+    <link rel="stylesheet" href="/static/Bootstrap/css/bootstrap.css">
+    <script type="text/javascript" src="/static/js/jquery-2.1.1.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div style="text-align: center">
+        <input type="text" id="operator1" placeholder="姓名" value={{ operator }}>
+    </div>
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+{% block script %}{% endblock %}
+</html>
